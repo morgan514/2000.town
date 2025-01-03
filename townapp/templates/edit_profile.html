@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block main %}
+<h2><u>Change Bio & Profile Picture</u></h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in profile_form %}
+    <div>
+        <b>{{ field.label_tag }}</b><br>
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <br>
+    <button type="submit">Update Profile</button>
+</form>
+
+<br>
+<hr>
+
+
+<h2><u>Change Username and Email</u></h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in user_form %}
+    <div>
+        <b>{{ field.label_tag }}</b><br>
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <br>
+    <button type="submit">Update Username and/or Email</button>
+</form>
+
+<br>
+<hr>
+
+<h2><u>Change Password</u></h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in password_form %}
+    <div>
+        <b>{{ field.label_tag }}</b><br>
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <br>
+    <button type="submit">Update Password</button>
+</form>
+
+
+<br><br>
+{% endblock %}
+
+

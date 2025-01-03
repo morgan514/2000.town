@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main %}
+
+
+<h2><u>Users</u> <small>({{users_list.count}})</small></h2>
+
+   {% for u in users_list %}
+   {% if not request.session.text_only_mode %}
+   {% if u.userprofile.profile_picture %}
+
+      {% if u.userprofile.is_gif %}
+      <img src="{{ u.userprofile.profile_picture.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+      {% else %}
+      <img src="{{ u.userprofile.thumbnail.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+      {% endif %}
+
+   {% else %}
+        <img src="{% static 'w.png' %}" style="width: 12px; height: 12px; object-fit: contain; margin: 2px; opacity:0;">
+   {% endif %}
+   {% endif %}
+   <a href="/user/{{u.username}}">{{u.username}}</a><small> ({{ u.blogpost_set.count }})</small><br>
+   {% endfor %}
+
+<br><br>
+
+
+
+
+
+
+
+
+
+{% endblock %}

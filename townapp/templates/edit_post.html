@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block main %}
+<h2>Edit Post</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+    <div>
+        <b>{{ field.label_tag }}</b>
+
+        {% if field.name == 'embed' %}
+        <small>(Youtube, Soundcloud or Vimeo) <br><i>Ex: https://youtu.be/jNQXAC9IVRw</i></small>
+        {% endif %}
+        <br>
+
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <button type="submit">Save</button>
+</form>
+<br>
+[ <a href="{% url 'post' blog_post.id %}">Cancel Edit</a> ]
+<br><br>
+
+{% endblock %}

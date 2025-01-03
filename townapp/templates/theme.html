@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<h2>Edit Theme</h2>
+<small>↓ <i>Click on the colors to display the full palettes</i></small>
+<br><br>
+{{ theme_form.media }}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in theme_form %}
+    <div>
+        <b>{{ field.label_tag }}</b><br>
+        {{ field }}<br>
+        <!-- {{ field.errors }} -->
+    </div><br>
+    {% endfor %}
+    <button type="submit">Save Changes</button>
+    <br><br><a href="{% url 'reset_theme' %}">Reset to Default</a>
+</form>
+{% endblock %}

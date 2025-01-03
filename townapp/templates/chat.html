@@ -1,0 +1,50 @@
+
+    <!-- <div id="chat_container"> -->
+    <!-- <span style="color:white"><BR><BR>         CHATROOM</span> -->
+    <!-- <input id="chat-message-input" type="text">
+        <button id="chat-message-submit">Send</button>
+        <div id="chat-log"></div> -->
+    <!-- </div> -->
+    <!-- <hr>
+    <h6>© 2000.town</h6> -->
+    <script>
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/'
+        );
+
+        chatSocket.onopen = function () {
+            // Request chat history when WebSocket connection is established
+            chatSocket.send(JSON.stringify({ 'command': 'load_history' }));
+        };
+
+
+        chatSocket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+
+            if (data.command === 'load_history') {
+                // Handle chat history
+                const chatLog = document.querySelector('#chat-log');
+                for (const message of data.messages) {
+                    chatLog.innerHTML += '<div class="message"><strong>' + message.username + ':</strong> ' + message.message + '</div>';
+                }
+            } else {
+                // Handle incoming messages
+                const message = data.message;
+                const username = data.username;
+                const chatLog = document.querySelector('#chat-log');
+                chatLog.innerHTML += '<div class="message"><strong>' + username + ':</strong> ' + message + '</div>';
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function (event) {
+            const messageInput = document.querySelector('#chat-message-input');
+            const message = messageInput.value;
+
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+
+            messageInput.value = '';
+        };
+
+    </script>

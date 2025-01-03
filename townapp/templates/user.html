@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load blog_extras %}
+{% load custom_filters %}
+{% load url_edit %}
+
+{% block main %}
+
+{% if current_user == user_profile %}
+<small>[<a href="{% url 'edit_profile' %}">Edit Profile & Settings</a>]</small>
+{% endif %}
+
+
+<h2><u>{{ author_user }}</u></h2>
+
+
+{% if not request.session.text_only_mode %}
+{% if user_profile.profile_picture.url != "" %}
+<a href="{% url 'image_bio' user_profile.profile_picture %}">
+    <div style="width:222px;max-height:222px;">
+
+        {% if user_profile.is_gif %}
+                <img src="{{ user_profile.profile_picture.url }}" style="max-height:222px; max-width:100%;">
+            {% else %}
+                <img src="{{ user_profile.thumbnail.url }}" style="max-height:222px; max-width:100%;">
+            {% endif %}
+    </div>
+</a>
+<br>
+{% endif %}
+{% endif %}
+
+{% if user_profile.bio != "" %}
+{{ user_profile.bio | urlize |url_edit| linebreaksbr|parse_mentions|parse_hashtags|safe }}<br><br>
+{% endif %}
+<br>
+<small><i>Joined on {{ author_user.date_joined|date:"F j, Y" }}</i></small>
+<hr>
+{% if blog_posts.count != 0 %}
+<h2><u>Posted by {{ author_user }}</u> <small>({{blog_posts.count}})</small></h2>
+
+<form method="GET" class="form-inline">
+    {{filter_form}}
+    <button type="submit">Filter</button>
+</form>
+<br>
+
+{% for post in blog_posts %}
+    <small><i>{{ post.date | date:"d/m/y"}} ┐<br></i></small>
+    <a href="/post/{{post.pk}}">
+
+        {% if not request.session.text_only_mode %}
+        {% if post.image.url != "" %}
+            {% if post.is_gif %}
+                <img src="{{ post.image.url }}" style="width:35px;height:35px;object-fit:contain;float:left;margin:2px;" loading="lazy">
+            {% else %}
+                <img src="{{ post.thumbnail.url }}" style="width:35px;height:35px;object-fit:contain;float:left;margin:2px;" loading="lazy">
+            {% endif %}
+        {% else %}
+        <img width="35px" height="35px" style="float:left;margin:2px;" src="{% static 'w.png' %}">
+        {% endif %}
+        {% endif %}
+
+        {{post.title}}</a>
+
+        <small>({{ post.comment_set.count }})</small>
+    <br>
+
+    <i>└ 
+        {% if not request.session.text_only_mode %}
+        {% if post.author.userprofile.profile_picture %}
+
+            {% if post.author.userprofile.is_gif %}
+            <img src="{{ post.author.userprofile.profile_picture.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% else %}
+            <img src="{{ post.author.userprofile.thumbnail.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% endif %}
+
+        {% endif %}
+        {% endif %}
+        <b>{{ post.author }}</b> ─</i> 
+    <small><i>"{{ post.content | truncatechars:100}}"</i></small>
+    <br>
+    {% if post.tags.all.count != 0 %}
+    <small>
+        {% for tag in post.tags.all %}
+        <a href="{% url 'tagged' tag.slug %}"> #{{ tag }}</a>
+        {% endfor %}
+    </small>
+    {% endif %}
+    <hr style="border:none;background-color:rgb(222, 222, 222);height:1px;margin:10px">
+{% endfor %}
+{% else %}
+
+<h2>{{ author_user }} didn't post yet</h2>
+{% endif %}
+
+
+
+
+
+
+
+{% endblock %}

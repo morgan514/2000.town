@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load blog_extras %}
+{% load custom_filters %}
+{% load url_edit %}
+{% load embed_video_tags %}
+{% load rotate_image %}
+{% block main %}
+
+<h2><u>{{blog_post.title}}</u></h2>
+
+<i>
+    by 
+    {% if not request.session.text_only_mode %}
+    {% if blog_post.author.userprofile.profile_picture %}
+
+        {% if blog_post.author.userprofile.is_gif %}
+        <img src="{{ blog_post.author.userprofile.profile_picture.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px">
+        {% else %}
+        <img src="{{ blog_post.author.userprofile.thumbnail.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px">
+        {% endif %}
+
+    {% endif %}
+    {% endif %}
+    <a href="/user/{{blog_post.author}}">{{ blog_post.author }}</a> on {{ blog_post.date }}
+</i>
+
+{% if user == blog_post.author %}
+<small>[<a href="{% url 'edit_post' blog_post.id %}">Edit</a> | <a
+        href="{% url 'delete_post' blog_post.id %}">Delete</a>]</small>
+{% endif %}
+
+<p>{{blog_post.content | urlize|url_edit | linebreaksbr |parse_mentions|parse_hashtags|safe }}</p>
+
+{% if not request.session.text_only_mode %}
+{% if blog_post.image.url != "" %}
+<a href="{% url 'image' blog_post.image %}">
+    <div style="width:333px;max-height:333px;">
+        {% if blog_post.is_gif %}
+        <img src="{{ blog_post.image.url }}" style="max-height:333px; max-width:100%;">
+        {% else %}
+        <img src="{{ blog_post.thumbnail.url }}" style="max-height:333px; max-width:100%;">
+        {% endif %}
+    </div>
+</a><br>
+{% endif %}
+{% endif %}
+
+
+
+{% if blog_post.embed %}
+    {% if not request.session.text_only_mode %}
+    {% video blog_post.embed '333x250' %}   
+    <br>
+    {% else %}
+    <a href="{{blog_post.embed}}" target="_blank">{{blog_post.embed}}</a>
+    <br>
+    {% endif %}
+{% endif %}
+
+
+
+
+{% for tag in blog_post.tags.all %}
+<a href="{% url 'tagged' tag.slug %}"> #{{ tag }}</a>
+{% endfor %}
+
+{% if blog_post.tags.all.count != 0 %}
+<br><br>
+{% endif %}
+
+
+
+{% if blog_post.comment_set.all.count != 0  %}
+<hr>
+    {% if blog_post.comment_set.all.count == 1 %}
+    <h3><u>{{blog_post.comment_set.count}} Comment:</u></h3>
+    {% elif  blog_post.comment_set.all.count > 1%}
+    <h3><u>{{blog_post.comment_set.count}} Comments:</u></h3>
+    {% endif %}
+
+<form method="get">
+    <label for="sort">Sort by:</label>
+    <select name="sort" id="sort">
+        <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Latest First</option>
+        <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Oldest First</option>
+    </select>
+    <button type="submit">Apply</button>
+</form>
+<br>
+ 
+    {% for comment in comments %}
+    <li>
+        {% if not request.session.text_only_mode %}
+        {% if comment.user.userprofile.profile_picture %}
+        
+            {% if comment.user.userprofile.is_gif %}
+            <img src="{{ comment.user.userprofile.profile_picture.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% else %}
+            <img src="{{ comment.user.userprofile.thumbnail.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% endif %}
+
+        {% endif %}
+        {% endif %}
+        <strong><a href="{% url 'user' comment.user.username %}">{{ comment.user.username}}</a>:</strong> {{comment.text | urlize|url_edit| linebreaksbr|parse_mentions|parse_hashtags|safe }}
+        <br>
+        {% if not request.session.text_only_mode %}
+        {% if comment.image %}
+        <a href="{% url 'image_comment' comment.image %}">
+           <div style="width:150px;max-height:150px;">
+            
+            {% if comment.is_gif %}
+                <img src="{{ comment.image.url }}" style="max-height:150px; max-width:100%;" loading="lazy">
+            {% else %}
+                <img src="{{ comment.thumbnail.url | rotate_image }}" style="max-height:150px; max-width:100%;" loading="lazy">
+            {% endif %}          
+
+      
+        </div>
+        
+        </a>
+        {% endif %}
+        {% endif %}
+
+
+        {% if comment.embed %}
+            {% if not request.session.text_only_mode %}
+            {% video comment.embed '200x150' %}
+            <br>
+            {% else %}
+            <a href="{{comment.embed}}" target="_blank">{{comment.embed}}</a>
+            <br>
+            {% endif %}
+        <br>
+        {% endif %}
+        
+
+        <small>[<i>{{ comment.created_at | date:"d/m/y" }} | </i></small>
+        <small><i>{{ comment.created_at | date:"H:i" }}</i>]</small>
+        {% if user == comment.user %}
+        <small>[<a href="{% url 'edit_comment' comment.id %}">Edit</a> |
+            <a href="{% url 'delete_comment' comment.id %}">Delete</a>] </small>
+        {% endif %}
+
+    </li><br>
+    {% endfor %}
+</ul>
+{% endif %}
+<hr>
+<h3><u>Leave a Comment:</u></h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+    <div>
+        <b>{{ field.label_tag }}</b>
+
+        {% if field.name == 'embed' %}
+        <small>(Youtube, Soundcloud or Vimeo) <br><i>Ex: https://youtu.be/jNQXAC9IVRw</i></small>
+        {% endif %}
+        
+        <br>
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <button type="submit">Submit Comment</button>
+</form>
+<br><br>
+
+
+
+{% endblock %}

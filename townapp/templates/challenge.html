@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main %}
+
+
+<h2>Music Challenges</h2>
+
+
+    Every month or so we collectively choose a theme 
+    and record a track to share with others once the timeframe
+    is up.
+
+    {% if ongoing %}
+    <h3>Ongoing</h3>
+    <ul>
+    {% for c in ongoing %}
+    <li><a href="{% url 'challengetrack' c.slug %}">{{c.name}}</a> <small>({{c.date}})</small></li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+
+
+    <h3>Archived</h3>
+    <ul>
+    {% for c in challenge %}
+
+    <li><a href="{% url 'challengetrack' c.slug %}">{{c.name}}</a> <small>({{c.date}})</small></li>
+
+    {% endfor %}
+    </ul>
+
+
+    
+
+
+{% endblock %}

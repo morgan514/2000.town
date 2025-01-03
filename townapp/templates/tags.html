@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main %}
+
+
+<h2><u>Tags</u> <small>({{tags.count}})</small></h2>
+
+{% for t in tags %}
+
+<a href="tag/{{t | lower}}">#{{t}}</a> ({{ t.post_count }}) 
+
+{% endfor %}
+
+<br><br>
+
+
+{% endblock %}

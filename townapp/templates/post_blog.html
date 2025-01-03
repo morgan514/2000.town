@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+
+{% block main %}
+{% if not rate_limit_message %}
+<h2><u>Post something</u></h2>
+{% endif %}
+<div id="post_form">
+    {% if rate_limit_message %}
+    <br>
+    <i><b>* {{ rate_limit_message }} *</b></i>
+    <br><br>
+    {% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div>
+        <b>{{ field.label_tag }}</b>
+        {% if field.name == 'tags' %}
+        <small>(Separated by commas) <br><i>Ex: apples,banana,oranges</i></small>
+        {% endif %}
+
+        {% if field.name == 'embed' %}
+        <small>(Youtube, Soundcloud or Vimeo) <br><i>Ex: https://youtu.be/jNQXAC9IVRw</i></small>
+        {% endif %}
+        <br>
+
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    {% if not rate_limit_message %}
+    <button type="submit">Post</button>
+    {% endif %}
+</form>
+</div>
+{% endblock %}

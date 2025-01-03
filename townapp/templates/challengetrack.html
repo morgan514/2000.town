@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block main %}
+
+<small>[{{challenge.date}}]</small> 
+<h2>{{challenge.name}}</h2>
+{{challenge.description | urlize| linebreaksbr }}
+
+<br><br>
+<ul>
+{% for track in challenge.track_set.all %}
+
+    <li><b>{{ track.track_name }}</b>
+        <br>
+        <i>└ {{track.track_author}}</i>
+        <br>
+            {% if track.track_description %}
+            <small>{{track.track_description}}</small>
+            <br>
+            {% endif %}
+            <br>
+            <audio controls>
+                <source src="{{track.audio.url}}">
+              </audio>
+
+        
+    </li>
+    <br><br>
+
+
+    
+
+{% endfor %}
+</ul>
+
+
+
+    
+
+
+{% endblock %}

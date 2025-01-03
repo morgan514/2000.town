@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load recent_activity %}
+
+
+{% block main %}
+{% if user.is_authenticated %}
+<h2><u>All Posts</u> <small>({{blogposts.count}})</small></h2>
+
+<form method="GET" class="form-inline">
+    {{ filter_form}}
+    <button type="submit">Filter</button>
+</form>
+<br>
+
+{% for post in blog_posts %}
+    <small><i>{{ post.date | date:"d/m/y"}}
+            {% if post.pinned == True %}
+            ┬ Pinned
+            {% else %}
+            ┐ 
+            {% endif %}
+            {% if not request.session.text_only_mode %}
+            {% if post.date >= threshold_time %}
+                <img src="{% static 'new4.gif' %}" style="width: 28px; height: 12px; object-fit: contain;margin:0px">
+            {% endif %}
+            {% if post.comment_set.count != 0 %}
+                {% if post.recent_activity_time >= threshold_time %}
+                    <img src="{% static 'updated.gif' %}" style="width: 40px; height: 12px; object-fit: contain;margin:0px"><small> @ {{post.recent_activity_time |date:"P"}}</small>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            </i></small>
+            {% if not request.session.text_only_mode %}
+            {% if post.recent_activity_time >= threshold_time %}
+            {% if post.comment_set.count >= 10 %}
+            <img src="{% static 'icon_fire.gif' %}" style="width: 12px; height: 12px; object-fit: contain;margin:0px">
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            <br>
+    <a href="/post/{{post.pk}}">
+
+        {% if not request.session.text_only_mode %}
+        {% if post.image.url != "" %}
+            {% if post.is_gif %}
+                <img src="{{ post.image.url }}" style="width:35px;height:35px;object-fit:contain;float:left;margin:2px;" loading="lazy">
+            {% else %}
+                <img src="{{ post.thumbnail.url }}" style="width:35px;height:35px;object-fit:contain;float:left;margin:2px;" loading="lazy">
+            {% endif %}
+        {% else %}
+        <img width="35px" height="35px" style="float:left;margin:2px;" src="{% static 'g.png' %}" loading="lazy">
+        {% endif %}
+        {% endif %}
+
+        {{post.title}}</a>
+
+    <small>({{ post.comment_set.count }})</small>
+
+
+    <br>
+
+    <i>└ 
+        {% if not request.session.text_only_mode %}
+        {% if post.author.userprofile.profile_picture %}
+
+            {% if post.author.userprofile.is_gif %}
+            <img src="{{ post.author.userprofile.profile_picture.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% else %}
+            <img src="{{ post.author.userprofile.thumbnail.url }}" style="width: 12px; height: 12px; object-fit: contain;margin:2px" loading="lazy">
+            {% endif %}
+
+        {% endif %}
+        {% endif %}
+        <b>{{ post.author }}</b> ─</i> 
+    <small><i>"{{ post.content | truncatechars:100}}"</i></small>
+    <br>
+        
+    {% if post.tags.all.count != 0 %}
+    <small>
+        {% for tag in post.tags.all %}
+        <a href="{% url 'tagged' tag.slug %}"> #{{ tag }}</a>
+        {% endfor %}
+    </small>
+    {% endif %}
+    <hr style="border:none;background-color:rgb(222, 222, 222);height:1px;margin:10px">
+{% endfor %}
+
+ <small>
+
+      {% if blog_posts.has_previous %}
+        <a href="?page={{ blogposts.previous_page_number }}"><</a> |
+      {% else %}
+        <span><</span> |
+      {% endif %}
+      {% for i in blog_posts.paginator.page_range %}
+        {% if blog_posts.number == i %}
+          <b><span class="paginActi">{{ i }}</span></b> |
+        {% else %}
+          <a href="?page={{ i }}">{{ i }}</a> |
+        {% endif %}
+      {% endfor %}
+      {% if blog_posts.has_next %}
+        <a href="?page={{ blog_posts.next_page_number }}">></a>
+      {% else %}
+        <span>></span>
+      {% endif %}
+
+
+ </small>
+{% endif %}
+
+
+{% if user.is_authenticated == False%}
+<pre>
+
+Remember when the internet wasn't all about 
+algorithms, ads and trackers?
+
+The web used to be a place to connect with 
+like-minded people, niche communities, forums,
+DIY websites, original content. 
+
+<i>2000.town</i> wishes to bring this feeling back,
+it's a place to share about, but not limited to:
+<b>
+Nature, low-technologies, collective ressources,
+life pro-tips, self/collective help, questions,
+renewable energy, alternative networks, news,
+local events, gatherings.... and more.
+</b></pre>
+<br>
+{% if not request.session.text_only_mode %}
+<img src="{% static 'nature.jpeg' %}" width="300px">
+{% endif %}
+
+{% endif %}
+
+
+{% endblock %}

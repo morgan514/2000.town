@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<h2><u>Login</u></h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div>
+        <b>{{ field.label_tag }}</b><br> 
+        {{ field }}<br>
+        {{ field.errors }}
+    </div><br>
+    {% endfor %}
+    <button type="submit">Login</button>
+</form>
+
+<pre><u><b>Note:</b></u> 
+ Usernames are <b>case sensitive</b>! 
+<i>  Ex: alice =/= Alice</i>
+</pre>
+{% endblock %}
