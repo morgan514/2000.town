@@ -1,0 +1,26 @@
+#header{
+    height: 50px;
+    background: white;
+    color: #000;
+  }
+  #header a:link, #header a:visited {
+      color: black;
+  }
+  #branding h1{
+    color: #000;
+    font-family:Helvetica;
+    font-weight: bold;
+  }
+
+
+
+  :root {
+    --primary: black;
+    --secondary:  black;
+    --link-fg: black;
+    --link-hover-color: #0d8531;
+    --link-selected-fg: #0d8531;
+    --button-hover-bg: #0d8531;
+    --default-button-hover-bg:#0d8531;
+
+  } 
